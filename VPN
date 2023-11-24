@@ -3,7 +3,7 @@
 # Author: Brent Garren
 # Date: November 23, 2023
 
-OPTIONS="HTB_LABS HTB_Competitive HTB_Academy THM_LABS"
+OPTIONS="HTB_LABS HTB_Competitive HTB_Academy THM_LABS Shutdown_VPN"
 select opt in $OPTIONS; do
         case $opt in
                 "HTB_LABS")
@@ -22,6 +22,9 @@ select opt in $OPTIONS; do
                         sudo openvpn $HOME/OpenVPN/THM_LABS.ovpn
                         break ;;
                 
+                "Shutdown_VPN")
+                        sudo killall openvpn 
+                        break ;;
 
         esac
 done
