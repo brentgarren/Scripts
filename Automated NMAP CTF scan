@@ -1,0 +1,31 @@
+#!/bin/bash
+# A simple script to automate various nmap commands used in CTF
+# Author: Brent Garren
+# Date: November 24, 2023
+
+# Define color escape sequences
+red="$(tput setaf 1)"
+yellow="$(tput setaf 3)"
+reset="$(tput sgr0)"
+
+
+
+# Get the IP address as input
+read -p "IP address: " ip_address
+
+# Run nmap to scan all ports
+echo "Scanning for open ports on $ip_address..."
+open_ports=$(nmap -p- --open -T4 $ip_address | grep ^[0-9] | cut -d '/' -f 1 | tr '\n' ',' | sed 's/,$//')
+
+# Check if any open ports were found
+if [ -z "$open_ports" ]; then
+    echo "No open ports found."
+    exit 1
+fi
+
+# Run nmap on each open port with aggressive scan options
+IFS=',' read -ra ports_array <<< "$open_ports"
+for port in "${ports_array[@]}"; do
+    echo "${red}Running Aggresive Scan on Port $port...${reset}"
+    nmap -p $port -A $ip_address | grep -vE 'Service detection performed|Nmap done|Starting Nmap|Nmap scan report|Host is up'
+done
