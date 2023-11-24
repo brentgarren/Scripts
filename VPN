@@ -3,28 +3,60 @@
 # Author: Brent Garren
 # Date: November 23, 2023
 
-OPTIONS="HTB_LABS HTB_Competitive HTB_Academy THM_LABS Shutdown_VPN"
-select opt in $OPTIONS; do
+
+while true; do
+    OPTIONS=("Hack The Box" "TryHackMe" "Shutdown all VPN" Exit)
+
+    select opt in "${OPTIONS[@]}"; do
         case $opt in
-                "HTB_LABS")
-                        sudo openvpn $HOME/OpenVPN/HTB_LABS.ovpn
-                        break ;;
+            "Hack The Box")
+                clear_lines() {
+                    local lines=$1
+                    tput cuu $lines    # Move cursor up by $lines
+                    tput ed            # Clear to end of screen
+                }
+                clear_lines 5
+                HTB_OPTIONS=(Labs Competitive Academy "Go Back")
+                select htb_opt in "${HTB_OPTIONS[@]}"; do
+                    case $htb_opt in
+                        "Labs")
+                            sudo openvpn $HOME/OpenVPN//OPENVPNFILE.ovpn
+                            break ;;
+                        "Competitive")
+                            sudo openvpn $HOME/OpenVPN//OPENVPNFILE.ovpn
+                            break ;;
+                        "Academy")
+                            sudo openvpn $HOME/OpenVPN/OPENVPNFILE.ovpn
+                            break ;;
+                        "Go Back")
+                            clear_lines() {
+                                local lines=$1
+                                tput cuu $lines    # Move cursor up by $lines
+                                tput ed            # Clear to end of screen
+                            }
+                            clear_lines 5
+                            break ;;
+                        *)
+                            echo "Invalid"
+                            ;;
+                    esac
+                done
+                break ;;
 
-                "HTB_Competitive")
-                        sudo openvpn $HOME/OpenVPN/HTB_Competitive.ovpn
-                        break ;;
+            "TryHackMe")
+                sudo openvpn $HOME/OpenVPN/OPENVPNFILE.ovpn
+                break ;;
 
-                "HTB_Academy")
-                        sudo openvpn $HOME/OpenVPN/HTB_Academy.ovpn
-                        break ;;
+            "Shutdown all VPN")
+                sudo killall openvpn
+                break ;;
 
-                "THM_LABS")
-                        sudo openvpn $HOME/OpenVPN/THM_LABS.ovpn
-                        break ;;
-                
-                "Shutdown_VPN")
-                        sudo killall openvpn 
-                        break ;;
-
+            "Exit")
+                exit
+                break ;;
+            *)
+                echo "Invalid"
+                ;;
         esac
+    done
 done
