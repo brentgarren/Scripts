@@ -29,11 +29,6 @@ while true; do
                             sudo openvpn $HOME/OpenVPN/OPENVPNFILE.ovpn
                             break ;;
                         "Go Back")
-                            clear_lines() {
-                                local lines=$1
-                                tput cuu $lines    # Move cursor up by $lines
-                                tput ed            # Clear to end of screen
-                            }
                             clear_lines 5
                             break ;;
                         *)
