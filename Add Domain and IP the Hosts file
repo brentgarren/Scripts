@@ -1,0 +1,19 @@
+#!/bin/bash
+
+add_to_hosts_file() {
+    hosts_path="/etc/hosts"
+
+    read -p "Enter the domain name: " domain
+    read -p "Enter the IP address: " ip
+
+    entry="${ip}\t${domain}"
+
+    if grep -qF "$entry" "$hosts_path"; then
+        echo "Entry already exists in the hosts file."
+    else
+        echo -e "${entry}" | sudo tee -a "$hosts_path" >/dev/null
+        echo "Added ${domain} with IP ${ip} to the hosts file."
+    fi
+}
+
+add_to_hosts_file
