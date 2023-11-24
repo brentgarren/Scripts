@@ -35,7 +35,9 @@ OPTIONS=("Hack The Box" "TryHackMe" "Shutdown all VPN" Exit)
                             break ;;
                         *)
                             echo "Invalid"
-                            ;;
+                            sleep 2
+                            clear_lines 6
+                            break ;;
                     esac
                 done
                 break ;;
@@ -54,7 +56,9 @@ OPTIONS=("Hack The Box" "TryHackMe" "Shutdown all VPN" Exit)
                 break ;;
             *)
                 echo "Invalid"
-                ;;
+                clear_lines 6
+                sleep 2
+                break ;;
         esac
     done
 done
