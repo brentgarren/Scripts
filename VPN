@@ -5,16 +5,18 @@
 
 
 while true; do
-    OPTIONS=("Hack The Box" "TryHackMe" "Shutdown all VPN" Exit)
+
+clear_lines() {
+    local lines=$1
+    tput cuu $lines    # Move cursor up by $lines
+    tput ed            # Clear to end of screen
+}
+
+OPTIONS=("Hack The Box" "TryHackMe" "Shutdown all VPN" Exit)
 
     select opt in "${OPTIONS[@]}"; do
         case $opt in
             "Hack The Box")
-                clear_lines() {
-                    local lines=$1
-                    tput cuu $lines    # Move cursor up by $lines
-                    tput ed            # Clear to end of screen
-                }
                 clear_lines 5
                 HTB_OPTIONS=(Labs Competitive Academy "Go Back")
                 select htb_opt in "${HTB_OPTIONS[@]}"; do
