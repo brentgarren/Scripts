@@ -20,10 +20,10 @@ while true; do
                 select htb_opt in "${HTB_OPTIONS[@]}"; do
                     case $htb_opt in
                         "Labs")
-                            sudo openvpn $HOME/OpenVPN//OPENVPNFILE.ovpn
+                            sudo openvpn $HOME/OpenVPN/OPENVPNFILE.ovpn
                             break ;;
                         "Competitive")
-                            sudo openvpn $HOME/OpenVPN//OPENVPNFILE.ovpn
+                            sudo openvpn $HOME/OpenVPN/OPENVPNFILE.ovpn
                             break ;;
                         "Academy")
                             sudo openvpn $HOME/OpenVPN/OPENVPNFILE.ovpn
