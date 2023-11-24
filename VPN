@@ -1,0 +1,27 @@
+#!/bin/bash
+# A simple script to startup VPN Startup script for TryHackMe and HackTheBox
+# Author: Brent Garren
+# Date: November 23, 2023
+
+OPTIONS="HTB_LABS HTB_Competitive HTB_Academy THM_LABS"
+select opt in $OPTIONS; do
+        case $opt in
+                "HTB_LABS")
+                        sudo openvpn $HOME/OpenVPN/HTB_LABS.ovpn
+                        break ;;
+
+                "HTB_Competitive")
+                        sudo openvpn $HOME/OpenVPN/HTB_Competitive.ovpn
+                        break ;;
+
+                "HTB_Academy")
+                        sudo openvpn $HOME/OpenVPN/HTB_Academy.ovpn
+                        break ;;
+
+                "THM_LABS")
+                        sudo openvpn $HOME/OpenVPN/THM_LABS.ovpn
+                        break ;;
+                
+
+        esac
+done
