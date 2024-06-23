@@ -1,11 +1,26 @@
 #!/bin/bash
-# A simple script to to lookup all public information using the whois command and only returning the fields
+# A simple script to to lookup all public information from public repositories.
 # Author: Brent Garren
 # Date: June 23, 2024
 
 
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    echo "Syntax = who.sh <domain name> <scantype>"
+    echo "Scantype: 
+    full = returns complete scan results from all sources"
+    exit 1
+fi
+
 if [ -z "$1" ]; then
-    echo "Error: no site provided"
+    echo "Error: no url provided"
+    echo "syntax = \"who.sh <url> <scantype>\""
+    echo "For help use \"who.sh -h\" or \"who.sh --help\""
+    exit 1
+fi
+
+if [ "$2" = "full" ]; then
+    echo "Running full WHOIS lookup for site: $1"
+    whois "$1"
     exit 1
 fi
 
