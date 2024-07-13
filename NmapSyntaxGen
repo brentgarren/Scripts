@@ -1,0 +1,254 @@
+#!/bin/bash
+# A simple script to automate nmap for CTFs
+# Author: Brent Garren
+# Date: July 12, 2024
+
+##---------------------------Variables----------------------------##
+
+choice=-1
+command=""
+add_command=""
+ip_address=$1
+speed=$2 # -T0 -T1 -T2 -T3 -T4 -T5
+scantype=""
+issudo=""
+
+# Define color escape sequences
+reset="$(tput sgr0)"
+red="$(tput setaf 1)"
+yellow="$(tput setaf 3)"
+
+
+##----------------------------Help Menu----------------------------##
+
+if [ "$1" == "-h" ]; then
+    echo "Help Menu
+    Syntax: AutoNmap.sh <ip> <speed>
+    Speeds:
+        T0:
+        T1:
+        T2:
+        T3:
+        T4:
+        T5:
+        "
+    exit 0
+fi
+
+
+##----------------------------Parameter Check----------------------------##
+
+#Checks that an IP was provided
+if [ -z "$1" ]; then
+    echo "Syntax Error: ./AutoNmap.sh <IP> "
+    exit 1
+fi
+
+if [ -z "$2" ]; then
+    echo "Syntax Error: ./AutoNmap.sh <IP> <Speed> "
+    exit 1
+fi 
+
+##----------------------------Option Arrays----------------------------##
+
+scantypes=(
+    "-sT"
+    "-sS"
+    "-sU"
+    "-sA"
+    "-sW"
+    "-sM"
+    "-sN"
+    "-sF"
+    "-sX"
+    "-sR"
+    "-sO"
+    "-sY"
+)
+
+
+
+##----------------------------Functions----------------------------##
+
+#add parameters to command
+add_command() {
+	add_command+=$1
+    echo $add_command
+}
+
+#Clear the add_command variable
+function reset_add_command {
+    add_command=""
+    echo $add_command
+}
+
+#Current Written Syntax
+function current_syntax {
+    echo "Current Syntax $sudo nmap $scantype $command"
+}
+
+#Show Current Command and Clear the current $addcommand function
+function current_command {
+    command+=$add_command
+    add_command=""
+}
+
+# Function to display menu and handle user input
+display_menu() {
+    local options=("$@")  # Receive options array as arguments
+
+    echo "0: Next"
+    for (( i=0; i<${#options[@]}; i++ )); do
+        echo "$((i+1)): ${options[i]}"
+    done
+    echo "x: Run the Command"
+    echo "r: Clear current addition to command"
+
+    # Process user input
+    while true; do
+        read -p "Select Option: " choice
+        case $choice in
+            0)
+                break
+                ;;
+            [1-9])
+                index=$((choice-1))
+                selected_option="${options[index]}"
+                add_command "$selected_option "  # Example command addition
+                ;;
+            x)
+                current_command
+                find_ports
+                run_scan
+                exit 0
+                ;;
+
+            r)
+                reset_add_command
+                ;;
+            *)
+                echo "Invalid choice"
+                ;;
+        esac
+    done
+}
+
+display_menu_scantype() {
+    local options=("$@")  # Receive options array as arguments
+
+    echo "sT TCP Connect Scan"
+    echo "sS TCP SYN Scan"
+    echo "sU UDP Scan"
+    echo "sA ACK Scan"
+    echo "sW Window Scan"
+    echo "sM Maimon Scan"
+    echo "sN Null Scan"
+    echo "sF FIN Scan"
+    echo "sX XMAS Scan"
+    echo "sR TCP RPC Scan"
+    echo "sO IP Protocol Scan"
+    echo "sY SCTP INIT Scan"
+    echo "--------------------------------------------------------"
+    echo "--------------------------------------------------------"
+    echo "0: Continue"
+    for (( i=0; i<${#options[@]}; i++ )); do
+        echo "$((i+1)): ${options[i]}"
+    done
+    echo "x: Run the Command"
+    echo "r: clear current addition to command"
+
+
+    # Process user input
+    while true; do
+        read -p "Select Option: " choice
+        case $choice in
+            0)
+                if [ -z "$scantype" ]; then
+                    echo "Error: Select a Scantype"
+                    
+                else
+                    if [ $scantype != -sT ]; then
+                        issudo="sudo"
+                        clear
+                        current_syntax
+                        echo 
+                        break                    
+                    else
+                        clear
+                        current_syntax
+                        break 
+                    fi    
+                fi 
+                ;;
+            [1-9])
+                index=$((choice-1))
+                selected_option=""
+                selected_option="${options[index]}"
+                scantype="$selected_option"  # Example command addition
+                ;;
+            x)
+                if [ -z "$scantype" ]; then
+                    echo "Error: Select a Scantype"
+                else
+                    clear
+                    echo "running $issudo nmap $scantype $ip_address"
+                    current_command
+                    find_ports
+                    run_scan
+                    exit 0
+                fi
+                ;;
+            r)
+                reset_add_command
+                ;;
+            *)
+                echo "Invalid choice"
+                ;;
+        esac
+    done
+}
+
+function find_ports {
+    echo "Scanning for open ports on $ip_address..."
+    open_ports=$(nmap $scantype -p- --open $speed $ip_address | grep ^[0-9] | cut -d '/' -f 1 | tr '\n' ',' | sed 's/,$//')
+    
+    #Check if any open ports were found
+    if [ -z "$open_ports" ]; then
+        echo "No open ports found."
+        exit 1
+    fi
+
+    IFS=',' read -ra ports_array <<< "$open_ports"
+}
+
+run_scan() {
+    OPTIONS=("run" "cancel")
+    select opt in "${OPTIONS[@]}"; do
+        case $opt in
+            "run")
+                # Proceed with running the scan
+                for port in "${ports_array[@]}"; do
+                    echo "${red}Running Scans on Port $port...${reset}"
+                    $issudo nmap $scantype -p $port $command $ip_address | grep -vE 'Service detection performed|Nmap done|Starting Nmap|Nmap scan report|Host is up'
+                done
+                exit 0
+                ;;
+            "cancel")
+                echo "Exiting..."
+                exit 0
+                ;;
+            *) 
+                echo "Invalid option. Please select again."
+                ;;
+        esac
+    done
+}
+
+##----------------------------Main Script----------------------------##
+
+# Select the ScanType for the Nmap scan
+display_menu_scantype "${scantypes[@]}" ##Call the function with the scantypes array
+
+current_command
+
+exit
